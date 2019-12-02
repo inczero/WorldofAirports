@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">World of Airports</string>
+
+    <!--Main activity strings-->
+    <string name="main_activity_search_input_latitude">latitude</string>
+    <string name="main_activity_search_input_longitude">longitude</string>
+    <string name="main_activity_search_input_radius">radius</string>
+    <string name="main_activity_search_button">search</string>
+    <string name="main_activity_search_no_search_result">No airports found in the given radius!</string>
+
+    <!--No network layout strings (Main activity)-->
+    <string name="no_internet">No Internet connection. Make sure that Wi-Fi or cellular mobile data is turned on, then come back.</string>
+    <string name="exit_button_text">EXIT</string>
+
 </resources>
