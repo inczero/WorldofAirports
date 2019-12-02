@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -11,18 +10,23 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        tools:context=".MainActivity">
+        android:background="@color/colorSearchBackground"
+        tools:context=".activity.MainActivity">
 
         <EditText
             android:id="@+id/latitude_input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="12"
+            android:maxLength="7"
             android:hint="@string/main_activity_search_input_latitude"
-            android:layout_margin="2dp"
-            android:inputType="number"
+            android:layout_margin="3dp"
+            android:inputType="numberSigned|numberDecimal"
             android:fontFamily="sans-serif-thin"
+            android:textCursorDrawable="@null"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColorHint="@color/colorPrimary"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -34,10 +38,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="12"
+            android:maxLength="7"
             android:hint="@string/main_activity_search_input_longitude"
-            android:layout_margin="2dp"
-            android:inputType="number"
+            android:layout_margin="3dp"
+            android:inputType="numberSigned|numberDecimal"
             android:fontFamily="sans-serif-thin"
+            android:textCursorDrawable="@null"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColorHint="@color/colorPrimary"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintTop_toBottomOf="@+id/latitude_input"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -49,10 +58,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="12"
+            android:maxLength="7"
             android:hint="@string/main_activity_search_input_radius"
-            android:layout_margin="2dp"
+            android:layout_margin="3dp"
             android:inputType="number"
             android:fontFamily="sans-serif-thin"
+            android:textCursorDrawable="@null"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColorHint="@color/colorPrimary"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintTop_toBottomOf="@+id/longitude_input"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -66,6 +80,8 @@
             android:background="@color/colorPrimary"
             android:fontFamily="sans-serif"
             android:textColor="@color/colorAccent"
+            android:layout_margin="5dp"
+            android:shadowColor="@color/colorPrimaryDark"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +96,7 @@
         android:layout_height="match_parent"
         android:background="@color/colorAccent">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/main_activity_recycler_view_search_result"
             android:layout_height="match_parent"
             android:layout_width="match_parent"

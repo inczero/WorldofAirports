@@ -4,5 +4,7 @@
     <color name="colorPrimary">#0f62fe</color>
     <!-- Primary color dark: IBM Blue 80 -->
     <color name="colorPrimaryDark">#002d9c</color>
+    <!-- Search fields background color: IBM Blue 10 -->
+    <color name="colorSearchBackground">#edf5ff</color>
     <color name="colorAccent">#ffffff</color>
 </resources>

@@ -2,9 +2,9 @@
     <string name="app_name">World of Airports</string>
 
     <!--Main activity strings-->
-    <string name="main_activity_search_input_latitude">latitude</string>
-    <string name="main_activity_search_input_longitude">longitude</string>
-    <string name="main_activity_search_input_radius">radius</string>
+    <string name="main_activity_search_input_latitude">latitude (in degrees)</string>
+    <string name="main_activity_search_input_longitude">longitude (in degrees)</string>
+    <string name="main_activity_search_input_radius">radius (in kilometers)</string>
     <string name="main_activity_search_button">search</string>
     <string name="main_activity_search_no_search_result">No airports found in the given radius!</string>
 
