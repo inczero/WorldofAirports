@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
                     //longitude (in decimal degrees) should be in the interval [-180,180]
                     double longitudeInputValue = Double.parseDouble(longitudeInputString);
-                    if (!(longitudeInputValue >= -90 && longitudeInputValue <= 90)) {
+                    if (!(longitudeInputValue >= -180 && longitudeInputValue <= 180)) {
                         longitudeInputEditText.setError("Longitude value is incorrect!");
                         longitudeInputEditText.requestFocus();
                         return;
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
                     //endregion
 
-                    
+
                 }
             });
 
