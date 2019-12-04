@@ -5,13 +5,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.worldofairports.R;
+import com.example.worldofairports.model.Airport;
+
+import java.net.URL;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
             TextView noSearchResultTextView = findViewById(R.id.main_activity_no_search_result);
             noSearchResultTextView.setVisibility(View.GONE);
 
+            //asynctask
+            final DatabaseQuery databaseQueryAsyncTask = new DatabaseQuery();
+
             //layout elements
             final EditText latitudeInputEditText = findViewById(R.id.latitude_input);
             final EditText longitudeInputEditText = findViewById(R.id.longitude_input);
@@ -43,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
             searchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+                    //checking if database query is already running in the background
+                    if (databaseQueryAsyncTask.getStatus() == AsyncTask.Status.RUNNING) {
+                        return;
+                    }
+
                     String latitudeInputString = latitudeInputEditText.getText().toString();
                     String longitudeInputString = longitudeInputEditText.getText().toString();
                     String radiusInputString = radiusInputEditText.getText().toString();
@@ -87,14 +102,15 @@ public class MainActivity extends AppCompatActivity {
 
                     //endregion
 
-
+                    //query database with async task
+                    databaseQueryAsyncTask.execute(buildUrlForDatabaseQuery(latitudeInputValue, longitudeInputValue, radiusInputValue));
                 }
             });
 
         }
     }
 
-    //Check for internet connection
+    //region check for internet connection
     public boolean isOnline() {
         try {
             ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -104,4 +120,61 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     }
+    //endregion
+
+    //region URL builder for database query
+    private String buildUrlForDatabaseQuery(double latitude, double longitude, int radius) {
+        //1 degree of latitude -> 111 km
+        double lengthInDegreeLatitude = radius/111;
+        lengthInDegreeLatitude = Math.round(lengthInDegreeLatitude);
+
+        //1 degree of longitude -> cos(latitude)*111km
+        double lengthOfOneDegreeLongitude = Math.cos(Math.toRadians(latitude))*111;
+        double lengthInDegreeLongitude = radius/lengthOfOneDegreeLongitude;
+        lengthInDegreeLongitude = Math.round(lengthInDegreeLongitude);
+
+        int firstIntervalEnd = 0;
+        int secondIntervalEnd = 0;
+
+        //preparing the interval end values for the latitude part of the query
+        if (latitude < 0) {
+            firstIntervalEnd = (int) Math.round(latitude + lengthInDegreeLatitude);
+            secondIntervalEnd = (int) Math.round(latitude - lengthInDegreeLatitude);
+
+        } else {
+            firstIntervalEnd = (int) Math.round(latitude - lengthInDegreeLatitude);
+            secondIntervalEnd = (int) Math.round(latitude + lengthInDegreeLatitude);
+        }
+        String urlLatitudePart = firstIntervalEnd + "%20TO%20" + secondIntervalEnd;
+
+        //preparing the interval end values for the longitude part of the query
+        if (longitude < 0) {
+            firstIntervalEnd = (int) Math.round(longitude + lengthInDegreeLongitude);
+            secondIntervalEnd = (int) Math.round(longitude - lengthInDegreeLongitude);
+
+        } else {
+            firstIntervalEnd = (int) Math.round(longitude - lengthInDegreeLongitude);
+            secondIntervalEnd = (int) Math.round(longitude + lengthInDegreeLongitude);
+        }
+        String urlLongitudePart = firstIntervalEnd + "%20TO%20" + secondIntervalEnd;
+
+        return "https://mikerhodes.cloudant.com/airportdb/_design/view1/_search/geo?q=lon:[" +
+                urlLongitudePart + "]%20AND%20lat:[" + urlLatitudePart + "]";
+    }
+    //endregion
+
+    //region AsyncTask (this class will handle the database query in the background, separated from the UI thread)
+    private class DatabaseQuery extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... strings) {
+            List<Airport> airports;
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+    //endregion
 }
