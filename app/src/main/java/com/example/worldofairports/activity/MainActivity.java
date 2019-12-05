@@ -9,13 +9,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.ArrayMap;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.worldofairports.R;
 import com.example.worldofairports.adapter.SearchResultListAdapter;
@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView noSearchResultTextView;
     private ProgressBar searchProgressBar;
+    private Button searchButton;
 
     private RecyclerView searchResultRecyclerView;
     private RecyclerView.Adapter searchResultListAdapter;
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             final EditText latitudeInputEditText = findViewById(R.id.latitude_input);
             final EditText longitudeInputEditText = findViewById(R.id.longitude_input);
             final EditText radiusInputEditText = findViewById(R.id.radius_input);
-            Button searchButton = findViewById(R.id.search_button);
+            searchButton = findViewById(R.id.search_button);
             searchProgressBar = findViewById(R.id.main_activity_progress_bar);
 
             //recycler view setup
@@ -118,7 +119,9 @@ public class MainActivity extends AppCompatActivity {
                     int radiusInputValue = Integer.parseInt(radiusInputString);
 
                     //endregion
-                    //TODO: myButton.setEnabled(false) -> one running async task
+
+                    //turn off search button until async task is finished
+                    searchButton.setEnabled(false);
 
                     //query database with async task
                     new DatabaseQuery().execute(buildUrlForDatabaseQuery(latitudeInputValue, longitudeInputValue, radiusInputValue));
@@ -154,9 +157,7 @@ public class MainActivity extends AppCompatActivity {
         int firstIntervalEnd = 0;
         int secondIntervalEnd = 0;
 
-        //TODO: Add -/ to the URL
-
-        //preparing the interval end values for the latitude part of the query
+        //region preparing the interval end values for the LATITUDE part of the query
         if (latitude < 0) {
             firstIntervalEnd = (int) Math.round(latitude + lengthInDegreeLatitude);
             secondIntervalEnd = (int) Math.round(latitude - lengthInDegreeLatitude);
@@ -165,9 +166,22 @@ public class MainActivity extends AppCompatActivity {
             firstIntervalEnd = (int) Math.round(latitude - lengthInDegreeLatitude);
             secondIntervalEnd = (int) Math.round(latitude + lengthInDegreeLatitude);
         }
-        String urlLatitudePart = firstIntervalEnd + "%20TO%20" + secondIntervalEnd;
 
-        //preparing the interval end values for the longitude part of the query
+        String urlLatitudePart;
+        if (firstIntervalEnd < 0) {
+            urlLatitudePart = "-/" + Math.abs(firstIntervalEnd) + "%20TO%20";
+        } else {
+            urlLatitudePart = firstIntervalEnd + "%20TO%20";
+        }
+
+        if (secondIntervalEnd < 0) {
+            urlLatitudePart += "-/" + Math.abs(secondIntervalEnd);
+        } else {
+            urlLatitudePart += secondIntervalEnd;
+        }
+        //endregion
+
+        //region preparing the interval end values for the LONGITUDE part of the query
         if (longitude < 0) {
             firstIntervalEnd = (int) Math.round(longitude + lengthInDegreeLongitude);
             secondIntervalEnd = (int) Math.round(longitude - lengthInDegreeLongitude);
@@ -176,10 +190,28 @@ public class MainActivity extends AppCompatActivity {
             firstIntervalEnd = (int) Math.round(longitude - lengthInDegreeLongitude);
             secondIntervalEnd = (int) Math.round(longitude + lengthInDegreeLongitude);
         }
-        String urlLongitudePart = firstIntervalEnd + "%20TO%20" + secondIntervalEnd;
 
-        return "https://mikerhodes.cloudant.com/airportdb/_design/view1/_search/geo?q=lon:[" +
+        String urlLongitudePart;
+        if (firstIntervalEnd < 0) {
+            urlLongitudePart = "-/" + Math.abs(firstIntervalEnd) + "%20TO%20";
+        } else {
+            urlLongitudePart = firstIntervalEnd + "%20TO%20";
+        }
+
+        if (secondIntervalEnd < 0) {
+            urlLongitudePart += "-/" + Math.abs(secondIntervalEnd);
+        } else {
+            urlLongitudePart += secondIntervalEnd;
+        }
+        //endregion
+
+        String test = "https://mikerhodes.cloudant.com/airportdb/_design/view1/_search/geo?q=lon:[" +
                 urlLongitudePart + "]%20AND%20lat:[" + urlLatitudePart + "]";
+        System.out.println(test);
+
+        return test;
+//        return "https://mikerhodes.cloudant.com/airportdb/_design/view1/_search/geo?q=lon:[" +
+//                urlLongitudePart + "]%20AND%20lat:[" + urlLatitudePart + "]";
     }
     //endregion
 
@@ -201,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 airportsDataJson = getJsonFromUrl(databaseQueryUrlString);
             } catch (IOException e) {
-                //TODO: SNACKBAR ERROR DISPLAY
+                Toast.makeText(getApplicationContext(), "An error happened!", Toast.LENGTH_LONG).show();
             }
 
             Airport[] airports = getDataFromJson(airportsDataJson);
@@ -215,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            //TODO: SORT THE MAP BY VALUE!
+            //TODO: Sort the data!
 
             return airportsWithDistanceData;
         }
@@ -230,10 +262,12 @@ public class MainActivity extends AppCompatActivity {
                 noSearchResultTextView.setVisibility(View.GONE);
                 searchResultRecyclerView.setVisibility(View.VISIBLE);
 
-                //TODO: change this to updater
                 searchResultListAdapter = new SearchResultListAdapter(airportsWithDistanceData);
                 searchResultRecyclerView.setAdapter(searchResultListAdapter);
             }
+
+            //re-enable search button
+            searchButton.setEnabled(true);
         }
 
         private String getJsonFromUrl(String url) throws IOException {
