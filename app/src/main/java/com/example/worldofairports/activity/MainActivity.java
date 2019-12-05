@@ -14,6 +14,7 @@ import android.util.ArrayMap;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.worldofairports.R;
@@ -27,11 +28,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private double longitudeInputValue;
 
     private TextView noSearchResultTextView;
+    private ProgressBar searchProgressBar;
 
     private RecyclerView searchResultRecyclerView;
     private RecyclerView.Adapter searchResultListAdapter;
@@ -66,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             final EditText longitudeInputEditText = findViewById(R.id.longitude_input);
             final EditText radiusInputEditText = findViewById(R.id.radius_input);
             Button searchButton = findViewById(R.id.search_button);
+            searchProgressBar = findViewById(R.id.main_activity_progress_bar);
 
             //recycler view setup
             searchResultRecyclerView = findViewById(R.id.main_activity_recycler_view_search_result);
@@ -187,6 +185,13 @@ public class MainActivity extends AppCompatActivity {
 
     //region AsyncTask (this class will handle the database query in the background, separated from the UI thread)
     private class DatabaseQuery extends AsyncTask<String, Void, ArrayMap<Airport, Double>> {
+
+        @Override
+        protected void onPreExecute() {
+            searchProgressBar.setVisibility(View.VISIBLE);
+            searchResultRecyclerView.setVisibility(View.GONE);
+        }
+
         @Override
         protected ArrayMap<Airport, Double> doInBackground(String... strings) {
             String databaseQueryUrlString = strings[0];
@@ -217,10 +222,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ArrayMap<Airport, Double> airportsWithDistanceData) {
+            searchProgressBar.setVisibility(View.GONE);
+
             if (airportsWithDistanceData.size() == 0) {
                 noSearchResultTextView.setVisibility(View.VISIBLE);
             } else {
                 noSearchResultTextView.setVisibility(View.GONE);
+                searchResultRecyclerView.setVisibility(View.VISIBLE);
 
                 //TODO: change this to updater
                 searchResultListAdapter = new SearchResultListAdapter(airportsWithDistanceData);
@@ -253,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
             return airports;
         }
 
-        //distance calculator function based on Haversine formula
+        //distance calculator function based on haversine formula
         private double getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
             double earthRadius = 6371;
 
