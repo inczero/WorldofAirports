@@ -157,8 +157,14 @@ public class MainActivity extends AppCompatActivity {
         double lengthInDegreeLongitude = radius / lengthOfOneDegreeLongitude;
         lengthInDegreeLongitude = Math.round(lengthInDegreeLongitude);
 
-        int firstIntervalEnd = 0;
-        int secondIntervalEnd = 0;
+        //value correction if radius is lower than 111km
+        if (radius < 111) {
+            lengthInDegreeLatitude++;
+            lengthInDegreeLongitude++;
+        }
+
+        int firstIntervalEnd;
+        int secondIntervalEnd;
 
         //region preparing the interval end values for the LATITUDE part of the query
         if (latitude < 0) {
@@ -208,13 +214,8 @@ public class MainActivity extends AppCompatActivity {
         }
         //endregion
 
-        String test = "https://mikerhodes.cloudant.com/airportdb/_design/view1/_search/geo?q=lon:[" +
+        return "https://mikerhodes.cloudant.com/airportdb/_design/view1/_search/geo?q=lon:[" +
                 urlLongitudePart + "]%20AND%20lat:[" + urlLatitudePart + "]";
-        System.out.println(test);
-
-        return test;
-//        return "https://mikerhodes.cloudant.com/airportdb/_design/view1/_search/geo?q=lon:[" +
-//                urlLongitudePart + "]%20AND%20lat:[" + urlLatitudePart + "]";
     }
     //endregion
 
