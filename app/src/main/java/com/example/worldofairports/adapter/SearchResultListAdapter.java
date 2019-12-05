@@ -1,6 +1,5 @@
 package com.example.worldofairports.adapter;
 
-import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,24 +9,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.worldofairports.R;
-import com.example.worldofairports.model.Airport;
+import com.example.worldofairports.model.AirportAndDistance;
 
-import java.util.Locale;
+import java.util.List;
 
 public class SearchResultListAdapter extends RecyclerView.Adapter<SearchResultListAdapter.SearchResultViewHolder> {
 
-    private ArrayMap<Airport, Double> airportsWithDistanceData;
+    private List<AirportAndDistance> airportsWithDistanceData;
 
-    public SearchResultListAdapter(ArrayMap<Airport, Double> airportsWithDistanceData) {
+    public SearchResultListAdapter(List<AirportAndDistance> airportsWithDistanceData) {
         this.airportsWithDistanceData = airportsWithDistanceData;
     }
 
     @Override
     public void onBindViewHolder(@NonNull SearchResultViewHolder holder, int position) {
-        holder.name.setText(airportsWithDistanceData.keyAt(position).getAirportData().getName());
-        holder.latitude.setText(Double.toString(airportsWithDistanceData.keyAt(position).getAirportData().getLatitude()));
-        holder.longitude.setText(Double.toString(airportsWithDistanceData.keyAt(position).getAirportData().getLongitude()));
-        holder.distanceToUserCoordinates.setText(Double.toString(airportsWithDistanceData.valueAt(position)));
+        holder.name.setText(airportsWithDistanceData.get(position).getAirport().getAirportData().getName());
+        holder.latitude.setText(Double.toString(airportsWithDistanceData.get(position).getAirport().getAirportData().getLatitude()));
+        holder.longitude.setText(Double.toString(airportsWithDistanceData.get(position).getAirport().getAirportData().getLongitude()));
+        holder.distanceToUserCoordinates.setText(Double.toString(airportsWithDistanceData.get(position).getDistanceToUserCoordinates()));
     }
 
     @NonNull

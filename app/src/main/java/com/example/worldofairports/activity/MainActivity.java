@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.ArrayMap;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +19,7 @@ import android.widget.Toast;
 import com.example.worldofairports.R;
 import com.example.worldofairports.adapter.SearchResultListAdapter;
 import com.example.worldofairports.model.Airport;
+import com.example.worldofairports.model.AirportAndDistance;
 import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
@@ -28,18 +28,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private double latitudeInputValue;
     private double longitudeInputValue;
+    private int radiusInputValue;
 
     private TextView noSearchResultTextView;
     private ProgressBar searchProgressBar;
     private Button searchButton;
 
     private RecyclerView searchResultRecyclerView;
-    private RecyclerView.Adapter searchResultListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
-                    int radiusInputValue = Integer.parseInt(radiusInputString);
+                    radiusInputValue = Integer.parseInt(radiusInputString);
 
                     //endregion
 
@@ -146,12 +149,12 @@ public class MainActivity extends AppCompatActivity {
     //region URL builder for database query
     private String buildUrlForDatabaseQuery(double latitude, double longitude, int radius) {
         //1 degree of latitude -> 111 km
-        double lengthInDegreeLatitude = radius/111;
+        double lengthInDegreeLatitude = radius / 111;
         lengthInDegreeLatitude = Math.round(lengthInDegreeLatitude);
 
         //1 degree of longitude -> cos(latitude)*111km
-        double lengthOfOneDegreeLongitude = Math.cos(Math.toRadians(latitude))*111;
-        double lengthInDegreeLongitude = radius/lengthOfOneDegreeLongitude;
+        double lengthOfOneDegreeLongitude = Math.cos(Math.toRadians(latitude)) * 111;
+        double lengthInDegreeLongitude = radius / lengthOfOneDegreeLongitude;
         lengthInDegreeLongitude = Math.round(lengthInDegreeLongitude);
 
         int firstIntervalEnd = 0;
@@ -216,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
     //endregion
 
     //region AsyncTask (this class will handle the database query in the background, separated from the UI thread)
-    private class DatabaseQuery extends AsyncTask<String, Void, ArrayMap<Airport, Double>> {
+    private class DatabaseQuery extends AsyncTask<String, Void, List<AirportAndDistance>> {
 
         @Override
         protected void onPreExecute() {
@@ -225,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected ArrayMap<Airport, Double> doInBackground(String... strings) {
+        protected List<AirportAndDistance> doInBackground(String... strings) {
             String databaseQueryUrlString = strings[0];
 
             String airportsDataJson = "";
@@ -238,22 +241,26 @@ public class MainActivity extends AppCompatActivity {
 
             Airport[] airports = getDataFromJson(airportsDataJson);
 
-            ArrayMap<Airport, Double> airportsWithDistanceData = new ArrayMap<>();
+            List<AirportAndDistance> airportsWithDistanceData = new ArrayList<>();
 
+            double distanceFromCoordinates = 0;
             if (airports.length > 0) {
-                for (int i = 0; i<airports.length; i++) {
-                    airportsWithDistanceData.put(airports[i], getDistanceFromLatLonInKm(airports[i].getAirportData().getLatitude(),
-                            airports[i].getAirportData().getLongitude(), latitudeInputValue, longitudeInputValue));
+                for (int i = 0; i < airports.length; i++) {
+                    distanceFromCoordinates = getDistanceFromLatLonInKm(airports[i].getAirportData().getLatitude(),
+                            airports[i].getAirportData().getLongitude(), latitudeInputValue, longitudeInputValue);
+                    if ((int) Math.round(distanceFromCoordinates) <= radiusInputValue) {
+                        airportsWithDistanceData.add(new AirportAndDistance(airports[i], distanceFromCoordinates));
+                    }
                 }
             }
 
-            //TODO: Sort the data!
+            Collections.sort(airportsWithDistanceData, new AirportAndDistance.SortByDistance());
 
             return airportsWithDistanceData;
         }
 
         @Override
-        protected void onPostExecute(ArrayMap<Airport, Double> airportsWithDistanceData) {
+        protected void onPostExecute(List<AirportAndDistance> airportsWithDistanceData) {
             searchProgressBar.setVisibility(View.GONE);
 
             if (airportsWithDistanceData.size() == 0) {
@@ -262,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                 noSearchResultTextView.setVisibility(View.GONE);
                 searchResultRecyclerView.setVisibility(View.VISIBLE);
 
-                searchResultListAdapter = new SearchResultListAdapter(airportsWithDistanceData);
+                RecyclerView.Adapter searchResultListAdapter = new SearchResultListAdapter(airportsWithDistanceData);
                 searchResultRecyclerView.setAdapter(searchResultListAdapter);
             }
 
@@ -288,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         private Airport[] getDataFromJson(String dataInJsonFormat) {
             int index = dataInJsonFormat.indexOf("[");
 
-            dataInJsonFormat = dataInJsonFormat.substring(index, dataInJsonFormat.length()-2);
+            dataInJsonFormat = dataInJsonFormat.substring(index, dataInJsonFormat.length() - 2);
 
             Airport[] airports = new GsonBuilder().create().fromJson(dataInJsonFormat, Airport[].class);
 
@@ -299,20 +306,20 @@ public class MainActivity extends AppCompatActivity {
         private double getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
             double earthRadius = 6371;
 
-            double dLat = Math.toRadians(lat2-lat1);
-            double dLon = Math.toRadians(lon2-lon1);
+            double dLat = Math.toRadians(lat2 - lat1);
+            double dLon = Math.toRadians(lon2 - lon1);
 
-            double a = Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(Math.toRadians(lat1))*Math.cos(Math.toRadians(lat2))*
-                    Math.sin(dLon/2)*Math.sin(dLon/2);
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
-            double c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-            double distance = earthRadius*c;
+            double distance = earthRadius * c;
 
             //rounding up distance to 2 decimal places
-            distance*=100;
+            distance *= 100;
             distance = Math.round(distance);
-            distance/=100;
+            distance /= 100;
 
             return distance;
         }

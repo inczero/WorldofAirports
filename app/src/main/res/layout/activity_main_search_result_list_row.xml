@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_height="90dp"
     android:layout_width="match_parent"
+    android:layout_height="90dp"
     card_view:cardCornerRadius="5dp"
     card_view:cardElevation="3dp"
     card_view:cardUseCompatPadding="true">
+
     <LinearLayout
-        android:layout_height="80dp"
         android:layout_width="match_parent"
+        android:layout_height="80dp"
         android:orientation="horizontal">
 
         <ImageView
             android:layout_width="70dp"
             android:layout_height="70dp"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_flight_takeoff_blue_24dp"/>
+            android:src="@drawable/ic_flight_takeoff_blue_24dp" />
 
         <LinearLayout
             android:layout_width="70dp"
@@ -28,51 +28,51 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/main_activity_search_result_list_row_name"/>
+                android:text="@string/main_activity_search_result_list_row_name" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/main_activity_search_result_list_row_latitude"/>
+                android:text="@string/main_activity_search_result_list_row_latitude" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/main_activity_search_result_list_row_longitude"/>
+                android:text="@string/main_activity_search_result_list_row_longitude" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/main_activity_search_result_list_row_distance"/>
+                android:text="@string/main_activity_search_result_list_row_distance" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/search_result_text_view_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"/>
+                android:maxLines="1" />
 
             <TextView
                 android:id="@+id/search_result_text_view_latitude"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/search_result_text_view_longitude"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/search_result_text_view_distance"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </LinearLayout>
