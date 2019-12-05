@@ -1,0 +1,17 @@
+The following steps are written using Android Studio version 3.5.2.
+The app's minimum SDK version is Android 8.0 Oreo (API 26).
+
+Build and run:
+  1. Download this project and open it in Android Studio.
+  
+  2. In the toolbar, select app from the run configurations drop-down menu (center part of the upper toolbar).
+  
+  3. From the target device drop-down menu (next to configuration drop-down menu), 
+  select the device that you want to run the app on.
+  If you don't have any devices configured, then you need to either connect a device
+  via USB or create an AVD (Android Virtual Device) to use the Android Emulator
+  
+  More info on connecting a device via USB: https://developer.android.com/studio/run/device#connect
+  More info on creating an AVD: https://developer.android.com/studio/run/managing-avds#createavd
+  
+  4. Click Run (green play button)
